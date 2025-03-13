@@ -1,3 +1,5 @@
+import tkinter as tk
+from tkinter import messagebox
 import random
 
 def print_board(board):
@@ -7,7 +9,6 @@ def print_board(board):
             print("-" * 9)
 
 def check_winner(board, player):
-    # Ellenőrzi a sorokat, oszlopokat és átlókat
     for row in board:
         if all([cell == player for cell in row]):
             return True
@@ -26,46 +27,53 @@ def get_empty_cells(board):
                 empty_cells.append((i, j))
     return empty_cells
 
-def player_move(board):
-    while True:
-        try:
-            row = int(input("Add meg a sor számát (0, 1, 2): "))
-            col = int(input("Add meg az oszlop számát (0, 1, 2): "))
-            if board[row][col] == " ":
-                board[row][col] = "X"
-                break
-            else:
-                print("Ez a hely már foglalt!")
-        except (ValueError, IndexError):
-            print("Érvénytelen lépés. Próbáld újra.")
+def player_move(board, row, col, buttons):
+    if board[row][col] == " ":
+        board[row][col] = "X"
+        buttons[row][col].config(text="X", state="disabled")
+        if check_winner(board, "X"):
+            messagebox.showinfo("Játék vége", "Gratulálok, nyertél!")
+            reset_game(board, buttons)
+        elif not get_empty_cells(board):
+            messagebox.showinfo("Játék vége", "Döntetlen!")
+            reset_game(board, buttons)
+        else:
+            computer_move(board, buttons)
 
-def computer_move(board):
+def computer_move(board, buttons):
     empty_cells = get_empty_cells(board)
     move = random.choice(empty_cells)
     board[move[0]][move[1]] = "O"
+    buttons[move[0]][move[1]].config(text="O", state="disabled")
+    if check_winner(board, "O"):
+        messagebox.showinfo("Játék vége", "A gép nyert!")
+        reset_game(board, buttons)
+    elif not get_empty_cells(board):
+        messagebox.showinfo("Játék vége", "Döntetlen!")
+        reset_game(board, buttons)
+
+def reset_game(board, buttons):
+    for i in range(3):
+        for j in range(3):
+            board[i][j] = " "
+            buttons[i][j].config(text="", state="normal")
 
 def main():
     board = [[" " for _ in range(3)] for _ in range(3)]
-    print_board(board)
     
-    while True:
-        player_move(board)
-        print_board(board)
-        if check_winner(board, "X"):
-            print("Gratulálok, nyertél!")
-            break
-        if not get_empty_cells(board):
-            print("Döntetlen!")
-            break
-        
-        computer_move(board)
-        print_board(board)
-        if check_winner(board, "O"):
-            print("A gép nyert!")
-            break
-        if not get_empty_cells(board):
-            print("Döntetlen!")
-            break
+    root = tk.Tk()
+    root.title("Tic-tac-toe")
+    
+    buttons = [[None for _ in range(3)] for _ in range(3)]
+    
+    for i in range(3):
+        for j in range(3):
+            button = tk.Button(root, text="", width=10, height=3, 
+                               command=lambda i=i, j=j: player_move(board, i, j, buttons))
+            button.grid(row=i, column=j)
+            buttons[i][j] = button
+    
+    root.mainloop()
 
 if __name__ == "__main__":
     main()
