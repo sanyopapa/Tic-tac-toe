@@ -1,1 +1,1 @@
-#Tic-tac-toe in python with tinkter
+# Tic-tac-toe in python with tinkter
