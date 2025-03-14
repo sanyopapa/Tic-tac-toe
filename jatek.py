@@ -38,7 +38,7 @@ def player_move(board, row, col, buttons):
             messagebox.showinfo("Játék vége", "Döntetlen!")
             reset_game(board, buttons)
         else:
-            computer_move(board, buttons)
+            buttons[0][0].after(1000, lambda: computer_move(board, buttons))
 
 def computer_move(board, buttons):
     empty_cells = get_empty_cells(board)
