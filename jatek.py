@@ -2,12 +2,6 @@ import tkinter as tk
 from tkinter import messagebox
 import random
 
-def print_board(board):
-    for i, row in enumerate(board):
-        print(" | ".join(row))
-        if i < len(board) - 1:
-            print("-" * 9)
-
 def check_winner(board, player):
     for row in board:
         if all([cell == player for cell in row]):
