@@ -24,7 +24,7 @@ def get_empty_cells(board):
 def player_move(board, row, col, buttons, difficulty):
     if board[row][col] == " ":
         board[row][col] = "X"
-        buttons[row][col].config(text="X", state="disabled")
+        buttons[row][col].config(text="X", state="disabled", disabledforeground="blue")
         if check_winner(board, "X"):
             messagebox.showinfo("Játék vége", "Gratulálok, nyertél!")
             reset_game(board, buttons)
@@ -42,7 +42,7 @@ def computer_move(board, buttons, difficulty):
         _, move = minimax(board, True)
     
     board[move[0]][move[1]] = "O"
-    buttons[move[0]][move[1]].config(text="O", state="disabled")
+    buttons[move[0]][move[1]].config(text="O", state="disabled", disabledforeground="red")
     if check_winner(board, "O"):
         messagebox.showinfo("Játék vége", "A gép nyert!")
         reset_game(board, buttons)
@@ -51,7 +51,6 @@ def computer_move(board, buttons, difficulty):
         reset_game(board, buttons)
 
 def minimax(board, is_maximizing):
-    winner = None
     if check_winner(board, "X"):
         return -1, None
     if check_winner(board, "O"):
@@ -88,27 +87,37 @@ def reset_game(board, buttons):
             board[i][j] = " "
             buttons[i][j].config(text="", state="normal")
 
+def on_hover(button, color):
+    button.config(bg=color)
+
+def on_leave(button, color):
+    button.config(bg=color)
+
 def main():
     board = [[" " for _ in range(3)] for _ in range(3)]
     
     root = tk.Tk()
     root.title("Tic-tac-toe")
-    
+    root.configure(bg="#f0f0f0") 
+
     difficulty = tk.StringVar(value="Könnyű")
     
-    difficulty_frame = tk.Frame(root)
-    difficulty_frame.grid(row=0, column=0, columnspan=3)
-    tk.Label(difficulty_frame, text="Nehézségi szint:").pack(side=tk.LEFT)
-    tk.Radiobutton(difficulty_frame, text="Könnyű", variable=difficulty, value="Könnyű").pack(side=tk.LEFT)
-    tk.Radiobutton(difficulty_frame, text="Nehéz", variable=difficulty, value="Nehéz").pack(side=tk.LEFT)
+    difficulty_frame = tk.Frame(root, bg="#f0f0f0")
+    difficulty_frame.grid(row=0, column=0, columnspan=3, pady=10)
+    tk.Label(difficulty_frame, text="Nehézségi szint:", bg="#f0f0f0", font=("Helvetica", 12, "bold")).pack(side=tk.LEFT)
+    tk.Radiobutton(difficulty_frame, text="Könnyű", variable=difficulty, value="Könnyű", bg="#f0f0f0", font=("Helvetica", 10)).pack(side=tk.LEFT)
+    tk.Radiobutton(difficulty_frame, text="Nehéz", variable=difficulty, value="Nehéz", bg="#f0f0f0", font=("Helvetica", 10)).pack(side=tk.LEFT)
     
     buttons = [[None for _ in range(3)] for _ in range(3)]
     
     for i in range(3):
         for j in range(3):
-            button = tk.Button(root, text="", width=10, height=3, 
+            button = tk.Button(root, text="", width=10, height=3, font=("Helvetica", 16, "bold"),
+                               bg="#ffffff", activebackground="#d9d9d9", relief="raised",
                                command=lambda i=i, j=j: player_move(board, i, j, buttons, difficulty.get()))
-            button.grid(row=i+1, column=j)  
+            button.grid(row=i+1, column=j, padx=5, pady=5)  
+            button.bind("<Enter>", lambda e, b=button: on_hover(b, "#e6e6e6"))
+            button.bind("<Leave>", lambda e, b=button: on_leave(b, "#ffffff"))
             buttons[i][j] = button
     
     root.mainloop()
